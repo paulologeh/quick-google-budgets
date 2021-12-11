@@ -1,4 +1,5 @@
 from typing import Union
+from .categories import income_categories_mapping, expense_categories_mappings
 
 
 class Transaction:
@@ -7,15 +8,27 @@ class Transaction:
 
     def classify_transaction(self) -> None:
         if "category" not in self.data:
-            pass
+            self.data["category"] = ""
+
+        else:
+            # map category
+            if self.data["amount"] >= 0:
+                categories = income_categories_mapping
+            else:
+                categories = expense_categories_mappings
+
+            for category in categories:
+                if self.data["category"] in categories[category]:
+                    print(f"{self.data['category']} -> {category}")
+                    self.data["category"] = category
 
     def format_data(self) -> None:
         def format_description(data: dict) -> str:
             if (
-                not data["description"] or
-                data["description"].lower() == 'none' or
-                len(data["description"]) <= 4 and
-                data["bank"] == "Monzo"
+                not data["description"]
+                or data["description"].lower() == "none"
+                or len(data["description"]) <= 4
+                and data["bank"] == "Monzo"
             ):
                 description = f"{data['name']} {data['type']}"
             else:
@@ -31,8 +44,8 @@ class Transaction:
             if arg in kwargs:
                 self.data.update({arg.lower(): kwargs[arg]})
 
-        self.classify_transaction()
         self.format_data()
+        self.classify_transaction()
 
     def get_transaction(self) -> dict:
         return self.data
