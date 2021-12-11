@@ -2,16 +2,16 @@ import csv
 from .transaction import Transaction
 
 
-def format_text(text):
+def format_text(text: str) -> str:
     return text.encode("ascii", "ignore").decode().strip()
 
 
 class Engine:
-    def __init__(self, month=None):
+    def __init__(self, month: str = None) -> None:
         self.transactions = []
         self.month = month
 
-    def get_transactions(self, *args, **kwargs):
+    def get_transactions(self, *args: str, **kwargs: str) -> None:
         with open(kwargs["filename"]) as csvfile:
             data = csv.DictReader(csvfile, delimiter=',')
             for row in data:
@@ -25,17 +25,14 @@ class Engine:
                 else:
                     print(f"ignoring transaction {bank_transaction}")
 
-    def get_monzo_transactions(self, filename):
+    def get_monzo_transactions(self, filename: str) -> None:
         self.get_transactions(self, "Date", "Description",
                               "Amount", "Name", "Type", filename=filename, bank="Monzo")
 
-    def get_santander_transactions(self, filename):
+    def get_santander_transactions(self, filename: str) -> None:
         self.get_transactions(self, "Date", "Description",
                               "Amount", filename=filename, bank="Santander")
 
-    def get_aqua_transactions(self, filename):
+    def get_aqua_transactions(self, filename: str) -> None:
         self.get_transactions(self, "Date", "Description",
                               "Amount", filename=filename, bank="Aqua")
-
-    def filter_internal_transfers(self):
-        pass

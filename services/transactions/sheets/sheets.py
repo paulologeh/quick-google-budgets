@@ -3,7 +3,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 
 class Sheets:
-    def __init__(self):
+    def __init__(self) -> None:
         scopes = [
             "https://www.googleapis.com/auth/spreadsheets",
             "https://www.googleapis.com/auth/drive",
@@ -14,15 +14,15 @@ class Sheets:
         # authenticate the JSON key with gspread
         self.client = gspread.authorize(credentials)
 
-    def open_worksheet(self, sheet_name="11. November", worksheet="Transactions"):
+    def open_worksheet(self, sheet_name: str, worksheet: str) -> None:
         self.sheet = self.client.open(sheet_name).worksheet(worksheet)
         self.range_end = len(self.sheet.get_all_values()) + 1
 
-    def clear_transactions(self):
+    def clear_transactions(self) -> None:
         # clear from cell 5 to the length + 1
         self.sheet.batch_clear([f"B5:J{self.range_end}"])
 
-    def write_transaction(self, _type, **kwargs):
+    def write_transaction(self, _type: str, **kwargs: str) -> None:
         if _type == "EXPENSE":
             _type = {
                 "date": "B",

@@ -1,5 +1,5 @@
 def convert_santander_text_to_csv(from_file: str, to_file: str) -> list:
-    def format_text(text):
+    def format_text(text: str) -> str:
         return text.encode("ascii", "ignore").decode().strip()
 
     with open(to_file, "w+") as normalised_file:
