@@ -54,7 +54,6 @@ class Sheets:
 
             row += 1
 
-        # worksheet.update('A1:B2', [[1, 2], [3, 4]])
         all_values = [
             [
                 transaction[_format[0]],
@@ -64,9 +63,6 @@ class Sheets:
             ]
             for transaction in transactions
         ]
-
-        for val in all_values:
-            print(val)
 
         rows_end = len(all_values) + row
 

@@ -1,15 +1,27 @@
 import csv
 from .transaction import Transaction
+from .categories import internal_transfers as X
 
-
-def format_text(text: str) -> str:
-    return text.encode("ascii", "ignore").decode().strip()
+CREDIT_CARDS = ["Aqua"]
 
 
 class Engine:
     def __init__(self, month: str = None) -> None:
         self.transactions = {"EXPENSE": [], "INCOME": []}
         self.month = month
+
+    def get_transaction_type(self, transaction: dict) -> str:
+        if transaction["bank"] in CREDIT_CARDS:
+            # negative credit card transanctions are income
+            if transaction["amount"] <= 0:
+                return "INCOME"
+            else:
+                return "EXPENSE"
+        else:
+            if transaction["amount"] >= 0:
+                return "INCOME"
+            else:
+                return "EXPENSE"
 
     def get_transactions(self, *args: str, **kwargs: str) -> None:
         with open(kwargs["filename"]) as csvfile:
@@ -20,14 +32,16 @@ class Engine:
                 transaction.set_transaction(*args, **row)
                 bank_transaction = transaction.get_transaction()
 
+                if self.is_internal_transfer(bank_transaction):
+                    print(f"ignoring internal transfer {bank_transaction}")
+                    continue
+
                 if f"/{self.month}/" in bank_transaction["date"]:
-                    if bank_transaction["amount"] >= 0:
-                        self.transactions["INCOME"].append(bank_transaction)
-                    else:
-                        bank_transaction["amount"] = abs(bank_transaction["amount"])
-                        self.transactions["EXPENSE"].append(bank_transaction)
+                    transaction_type = self.get_transaction_type(bank_transaction)
+                    bank_transaction["amount"] = abs(bank_transaction["amount"])
+                    self.transactions[transaction_type].append(bank_transaction)
                 else:
-                    print(f"ignoring transaction {bank_transaction}")
+                    print(f"ignoring out of month transanction {bank_transaction}")
 
     def get_monzo_transactions(self, filename: str) -> None:
         self.get_transactions(
@@ -58,4 +72,25 @@ class Engine:
         )
         self.transactions["EXPENSE"] = sorted(
             self.transactions["EXPENSE"], key=lambda x: x["date"]
+        )
+
+    def is_internal_transfer(self, transaction: dict) -> bool:
+        return (
+            any(
+                [
+                    description.upper() in transaction["description"].upper()
+                    for description in X["description"]
+                ]
+            )
+            or any(
+                [
+                    category.upper() in transaction["category"].upper()
+                    for category in X["category"]
+                ]
+            )
+            or transaction["amount"] == 0
+            or (
+                transaction["description"] == "PAYMENT"
+                and transaction["bank"] == "Aqua"
+            )
         )

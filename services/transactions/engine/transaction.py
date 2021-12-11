@@ -19,7 +19,6 @@ class Transaction:
 
             for category in categories:
                 if self.data["category"] in categories[category]:
-                    print(f"{self.data['category']} -> {category}")
                     self.data["category"] = category
 
     def format_data(self) -> None:
