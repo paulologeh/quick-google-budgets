@@ -6,9 +6,9 @@ CREDIT_CARDS = ["Aqua"]
 
 
 class Engine:
-    def __init__(self, month: str = None) -> None:
+    def __init__(self, months: list = []) -> None:
         self.transactions = {"EXPENSE": [], "INCOME": []}
-        self.month = month
+        self.months = months
 
     def get_transaction_type(self, transaction: dict) -> str:
         if transaction["bank"] in CREDIT_CARDS:
@@ -33,10 +33,12 @@ class Engine:
                 bank_transaction = transaction.get_transaction()
 
                 if self.is_internal_transfer(bank_transaction):
-                    print(f"ignoring internal transfer {bank_transaction}")
+                    # print(f"ignoring internal transfer {bank_transaction}")
                     continue
 
-                if f"/{self.month}/" in bank_transaction["date"]:
+                if any(
+                    f"/{month}/" in bank_transaction["date"] for month in self.months
+                ):
                     transaction_type = self.get_transaction_type(bank_transaction)
                     bank_transaction["amount"] = abs(bank_transaction["amount"])
                     self.transactions[transaction_type].append(bank_transaction)

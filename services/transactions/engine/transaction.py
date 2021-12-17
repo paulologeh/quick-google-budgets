@@ -1,5 +1,11 @@
 from typing import Union
-from .categories import income_categories_mapping, expense_categories_mappings
+from .categories import (
+    income_categories_mapping,
+    expense_categories_mappings,
+    description_knowledge,
+)
+
+CREDIT_CARDS = ["Aqua"]
 
 
 class Transaction:
@@ -8,18 +14,49 @@ class Transaction:
 
     def classify_transaction(self) -> None:
         if "category" not in self.data:
-            self.data["category"] = ""
-
-        else:
-            # map category
-            if self.data["amount"] >= 0:
-                categories = income_categories_mapping
+            if self.data["bank"] in CREDIT_CARDS:
+                categories = (
+                    description_knowledge["INCOME"]
+                    if self.data["amount"] <= 0
+                    else description_knowledge["EXPENSE"]
+                )
+            elif self.data["amount"] >= 0:
+                categories = description_knowledge["INCOME"]
             else:
-                categories = expense_categories_mappings
+                categories = description_knowledge["EXPENSE"]
 
+            found = False
             for category in categories:
-                if self.data["category"] in categories[category]:
+                if any(
+                    keyword.upper() in self.data["description"].upper()
+                    for keyword in categories[category]
+                ):
                     self.data["category"] = category
+                    found = True
+                    break
+
+            if not found:
+                self.data["category"] = "Other"
+
+            return
+        elif self.data["category"] in ["Transfers"]:
+            return
+
+        # map category
+        if self.data["amount"] >= 0:
+            categories = income_categories_mapping
+        else:
+            categories = expense_categories_mappings
+
+        found = False
+        for category in categories:
+            if self.data["category"] in categories[category]:
+                self.data["category"] = category
+                found = True
+                break
+
+        if not found:
+            self.data["category"] = "Other"
 
     def format_data(self) -> None:
         def format_description(data: dict) -> str:

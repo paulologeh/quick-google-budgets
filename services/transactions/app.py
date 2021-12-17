@@ -14,16 +14,17 @@ if __name__ == "__main__":
         "Aqua": "./data/11_2021_Aqua.csv",
     }
 
-    selected_month = "11"
+    selected_months = ["10", "11", "12"]
 
     # Get and process all transactions
-    bank_engine = Engine(selected_month)
+    bank_engine = Engine(selected_months)
+
     bank_engine.get_santander_transactions(uploaded_statements["Santander"])
     bank_engine.get_monzo_transactions(uploaded_statements["Monzo"])
     bank_engine.get_aqua_transactions(uploaded_statements["Aqua"])
     bank_engine.sort_transactions()
 
-    spreadsheet_name = "11. November"
+    spreadsheet_name = "Q4"
     worksheet_name = "Transactions"
 
     # Open the spreadsheet

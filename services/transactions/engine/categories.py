@@ -33,6 +33,7 @@ monzo_income_categories_mapping = {
     "Paycheck": ["Income"],
     "Bonus": [],
     "Interest": [],
+    "Other": [],
 }
 
 income_categories_mapping = {
@@ -65,3 +66,27 @@ for category in expense_categories_mappings:
         expense_categories_mappings[category] += monzo_expense_categories_mappings[
             category
         ]
+
+description_knowledge = {
+    "INCOME": {
+        "Savings": [],
+        "Paycheck": ["PassFort"],
+        "Bonus": [],
+        "Interest": ["Interest"],
+        "Other": [],
+    },
+    "EXPENSE": {
+        "Food": ["Sainsbury", "Tesco", "Just Eat", "Dominos"],
+        "Gifts": [],
+        "Health/medical": [],
+        "Home": [],
+        "Transportation": ["Tfl Travel", "Uber", "Bolt", "Oyster"],
+        "Personal": ["Amazon", "Vue"],
+        "Pets": [],
+        "Utilities": ["EE"],
+        "Travel": [],
+        "Debt": ["Overdraft"],
+        "Other": [],
+        "Subscriptions": ["Netflix", "Spotify"],
+    },
+}
