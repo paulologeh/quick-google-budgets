@@ -1,14 +1,15 @@
 import csv
 from .transaction import Transaction
-from .categories import internal_transfers as X
+
 
 CREDIT_CARDS = ["Aqua"]
 
 
 class Engine:
-    def __init__(self, months: list = []) -> None:
+    def __init__(self, rules: dict, months: list = []) -> None:
         self.transactions = {"EXPENSE": [], "INCOME": []}
         self.months = months
+        self.rules = rules
 
     def get_transaction_type(self, transaction: dict) -> str:
         if transaction["bank"] in CREDIT_CARDS:
@@ -28,7 +29,7 @@ class Engine:
             data = csv.DictReader(csvfile, delimiter=",")
             for row in data:
                 # initialise transaction
-                transaction = Transaction(kwargs["bank"])
+                transaction = Transaction(self.rules, kwargs["bank"])
                 transaction.set_transaction(*args, **row)
                 bank_transaction = transaction.get_transaction()
 
@@ -43,7 +44,8 @@ class Engine:
                     bank_transaction["amount"] = abs(bank_transaction["amount"])
                     self.transactions[transaction_type].append(bank_transaction)
                 else:
-                    print(f"ignoring out of month transanction {bank_transaction}")
+                    pass
+                    # print(f"ignoring out of month transanction {bank_transaction}")
 
     def get_monzo_transactions(self, filename: str) -> None:
         self.get_transactions(
@@ -81,13 +83,13 @@ class Engine:
             any(
                 [
                     description.upper() in transaction["description"].upper()
-                    for description in X["description"]
+                    for description in self.rules["internal_transfers"]["description"]
                 ]
             )
             or any(
                 [
                     category.upper() in transaction["category"].upper()
-                    for category in X["category"]
+                    for category in self.rules["internal_transfers"]["category"]
                 ]
             )
             or transaction["amount"] == 0

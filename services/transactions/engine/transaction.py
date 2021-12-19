@@ -1,29 +1,25 @@
 from typing import Union
-from .categories import (
-    income_categories_mapping,
-    expense_categories_mappings,
-    description_knowledge,
-)
 
 CREDIT_CARDS = ["Aqua"]
 
 
 class Transaction:
-    def __init__(self, bank: str) -> None:
+    def __init__(self, rules: dict, bank: str) -> None:
         self.data = {"bank": bank}
+        self.rules = rules
 
     def classify_transaction(self) -> None:
         if "category" not in self.data:
             if self.data["bank"] in CREDIT_CARDS:
                 categories = (
-                    description_knowledge["INCOME"]
+                    self.rules["income"]["description_category"]
                     if self.data["amount"] <= 0
-                    else description_knowledge["EXPENSE"]
+                    else self.rules["expense"]["description_category"]
                 )
             elif self.data["amount"] >= 0:
-                categories = description_knowledge["INCOME"]
+                categories = self.rules["income"]["description_category"]
             else:
-                categories = description_knowledge["EXPENSE"]
+                categories = self.rules["expense"]["description_category"]
 
             found = False
             for category in categories:
@@ -44,9 +40,9 @@ class Transaction:
 
         # map category
         if self.data["amount"] >= 0:
-            categories = income_categories_mapping
+            categories = self.rules["income"]["category_category"]
         else:
-            categories = expense_categories_mappings
+            categories = self.rules["expense"]["category_category"]
 
         found = False
         for category in categories:
