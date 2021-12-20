@@ -5,16 +5,15 @@ from sheets.sheets import Sheets
 # from utils.santander_txt_to_csv import convert_santander_text_to_csv
 
 if __name__ == "__main__":
-    with open("./rules.json") as rules_files:
+    with open("./rules.json", "r") as rules_files:
         rules = json.load(rules_files)
 
-    uploaded_statements = {
-        "Santander": "./data/11/11_2021_Santander.csv",
-        "Monzo": "./data/11/11_2021_Monzo.csv",
-        "Aqua": "./data/11/11_2021_Aqua.csv",
-    }
+    with open("./config.json", "r") as config_json:
+        configs = json.load(config_json)
 
-    selected_months = ["11"]
+    uploaded_statements = configs["uploaded_statements"]
+
+    selected_months = int(configs["month"])
 
     # Get and process all transactions
     print("processing transactions")
@@ -25,7 +24,7 @@ if __name__ == "__main__":
     bank_engine.get_aqua_transactions(uploaded_statements["Aqua"])
     bank_engine.sort_transactions()
 
-    spreadsheet_name = "11. November"
+    spreadsheet_name = configs["spreadsheet"]
     worksheet_name = "Transactions"
 
     # Open the spreadsheet
